@@ -81,7 +81,14 @@ class WritingApp extends React.Component {
   handleStroke(char, text) {
     if (!this.state.run && !this.state.won) this.startWriting();
     this.toggleDanger(false);
-    const words = text.trim().length && text.trim().split(/\s+/).length;
+
+    // refers to https://www.regular-expressions.info/unicode.html
+    const cjkCharsPattern = /[\p{scx=Han}\p{scx=Bopomofo}\p{scx=Hiragana}\p{scx=Katakana}\p{scx=Hangul}\[\uff00-\uffef\]]/gmu;
+
+    const totalCjkCharacters = text.trim().length && (text.trim().match(cjkCharsPattern) != null) && (text.trim().match(cjkCharsPattern).length);
+    const totalOtherWords = text.trim().length && (text.replaceAll(cjkCharsPattern, ' ').trim().length) && (text.replaceAll(cjkCharsPattern, ' ').trim().split(/\s+/u).length);
+
+    const words = totalOtherWords + totalCjkCharacters;
     this.setState({
       text,
       words,
